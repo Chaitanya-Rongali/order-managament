@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { activeOrderServices, cancelOrderService, createOrderService, getTotalRevenue} from "../services/orderService";
+import { activeOrderServices, cancelOrderService, createOrderService, getTopSellingOrders, getTotalRevenue } from "../services/orderService";
 import { OrderType } from "../types/orderType";
 import { order } from "../models/order";
 import { Product } from "../models/product";
@@ -56,14 +56,25 @@ export const getActiveOrderController = async (req: Request, res: Response) => {
         return res.status(500).send("Error while fecthing active orders")
     }
 }
-export const fetchTotalRevenue=async(req:Request,res:Response)=>{
-    try{
-       const result=await getTotalRevenue();
-       if(result.length==0){
-        return res.status(204).send("Active orders not avilable")
-       }
-       return res.status(200).send(result[0].total_revenue)
-    }catch(error){
-       return res.status(500).send("Error while fetching total revenue")
+export const fetchTotalRevenue = async (req: Request, res: Response) => {
+    try {
+        const result = await getTotalRevenue();
+        if (result.length == 0) {
+            return res.status(204).send("Active orders not avilable")
+        }
+        return res.status(200).send(result[0].total_revenue)
+    } catch (error) {
+        return res.status(500).send("Error while fetching total revenue")
+    }
+}
+export const fetchTopSellingProducts = async (req: Request, res: Response) => {
+    try {
+        const result = await getTopSellingOrders();
+        if (result.length == 0) {
+            return res.status(204).send("Active orders not avilable")
+        }
+        return res.status(200).send(result)
+    } catch (error) {
+        return res.status(500).send("Error while fetching Top selling orders")
     }
 }
