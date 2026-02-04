@@ -24,3 +24,7 @@ export const cancelOrderService = async (id: string) => {
     )
     return await orderStatus;
 }
+export const activeOrderServices=async()=>{
+    const activeOrders= await order.find({order_status:'active'})
+    return activeOrders;
+}
