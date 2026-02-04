@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { cancelOrderService, createOrderService } from "../services/orderService";
+import { activeOrderServices, cancelOrderService, createOrderService } from "../services/orderService";
 import { OrderType } from "../types/orderType";
 import { order } from "../models/order";
 import { Product } from "../models/product";
@@ -23,18 +23,36 @@ export const createOrderController = async (req: Request, res: Response) => {
         res.status(201).send(order)
 
     } catch (error) {
-        res.status(500).send(error)
+        res.status(500).send("Error while creating order")
     }
 }
 export const cancelOrderController = async (req: Request, res: Response) => {
-    const id = req.params.id as string
-    if (!id) {
-        return res.status(400).send('id is required ')
+    try {
+        const id = req.params.id as string
+        if (!id) {
+            return res.status(400).send('id is required ')
+        }
+        const findOrder = await order.findById(id)
+        if (!findOrder) {
+            return res.status(400).send('Order is not avilable')
+        }
+        const orderStatus = await cancelOrderService(id)
+        res.status(200).send({ message: "successfully cancel the order" })
+
+    } catch (error) {
+        res.status(500).send("Error while cancel the order ")
     }
-    const findOrder = await order.findById(id)
-    if (!findOrder) {
-        return res.status(400).send('Order is not avilable')
+
+}
+export const getActiveOrderController = async (req: Request, res: Response) => {
+    try {
+        const getActiveOrders = await activeOrderServices()
+        if (getActiveOrders.length == 0) {
+            res.status(204).send("Active Orders are not avilable")
+        }
+        res.status(200).send(getActiveOrders)
+
+    } catch (error) {
+        res.status(500).send("Error while fecthing active orders")
     }
-    const orderStatus = await cancelOrderService(id)
-    res.status(200).send({ message: "successfully cancel the order" })
 }
