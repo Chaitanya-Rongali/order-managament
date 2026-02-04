@@ -25,22 +25,42 @@ export const cancelOrderService = async (id: string) => {
     )
     return await orderStatus;
 }
-export const activeOrderServices=async()=>{
-    const activeOrders= await order.find({order_status:'active'})
+export const activeOrderServices = async () => {
+    const activeOrders = await order.find({ order_status: 'active' })
     return activeOrders;
 }
-export const getTotalRevenue= async()=>{
-   const result=order.aggregate([{$match:{order_status:'active'}},
-    {$lookup:{
-        from:'products',
-        localField:'product_id',
-        foreignField:'_id',
-        as:'product_details'
-    }},
+export const getTotalRevenue = async () => {
+    const result = order.aggregate([{ $match: { order_status: 'active' } },
     {
-        $unwind:'$product_details'
+        $lookup: {
+            from: 'products',
+            localField: 'product_id',
+            foreignField: '_id',
+            as: 'product_details'
+        }
     },
-    {$group:{_id:null,total_revenue:{$sum:{$multiply:['$order_quantity','$product_details.Price']}}}}
-   ])
-   return result;
+    {
+        $unwind: '$product_details'
+    },
+    { $group: { _id: null, total_revenue: { $sum: { $multiply: ['$order_quantity', '$product_details.Price'] } } } }
+    ])
+    return result;
 }
+export const getTopSellingOrders = async () => {
+    const result = order.aggregate([{ $match: { order_status: 'active' } },
+    { $group: { _id: '$product_id', total_sold: { $sum: '$order_quantity' } } },
+    { $sort: { total_sold: -1 } },
+    { $limit: 2 },
+    {
+        $lookup: {
+            from: 'products',
+            localField: '_id',
+            foreignField: '_id',
+            as: 'product_details'
+        }
+    },
+    { $unwind: '$product_details' }
+    ])
+    return result;
+}
+
