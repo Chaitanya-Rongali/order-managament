@@ -33,6 +33,13 @@ npm start
 
    
 ##  Features:
+- Implement APIs to create a product with product name, product price and available stock quantity.
+- Implement APIs to fetch all products.
+- Implement APIs to create an order with order id , order status,product id and product id reference from product model.
+- Implement APIs to cancel an order.
+- Implement APIs to fetch only active orders.
+- Implement APIs to fecth total revenue generated.
+- Implement APIs to fetch top selling products.
 
 
 
